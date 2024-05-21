@@ -2,7 +2,7 @@
 
 My name is Joelma Renata Oliveira and I'm a front-end developer at Xp Investments in Brazil.
 Most of my experiences involved React, Redux, Next, Jest, and some .Net.
-I like photography and also I'm trying to learn french for fun.
+I like photography and also like learn new languages for fun.
 
 ![Renata's GitHub stats](https://github-readme-stats.vercel.app/api?username=rnataoliveira&show_icons=true&hide=contribs&theme=graywhite)
 
