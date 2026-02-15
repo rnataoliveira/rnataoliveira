@@ -6,3 +6,5 @@ I love creating documentation and tests. Some people think it's weird.
 Code with purpose. Learn with intention.
 
 [Resume](https://rnataoliveira.github.io/resume/)
+
+![Top Languages by Commit](./assets/top-languages-by-commit.svg)
