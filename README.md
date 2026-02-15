@@ -8,5 +8,6 @@ Code with purpose. Learn with intention.
 [Resume](https://rnataoliveira.github.io/resume/)
 
 ## 📊 Top Languages by Commit
+
 <img src="./assets/top-languages-by-commit.svg" width="220" alt="Top Languages by Commit" />
 
