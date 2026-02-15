@@ -1,0 +1,40 @@
+name: Generate Top Languages Chart
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * 1" # every Monday 09:00 UTC
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install matplotlib
+
+      - name: Generate chart
+        run: |
+          python scripts/generate_top_languages.py
+
+      - name: Commit changes (if any)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/top-languages-by-commit.svg assets/top-languages-by-commit.png
+          git diff --cached --quiet || git commit -m "chore: update top languages chart"
+          git push
