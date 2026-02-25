@@ -2,6 +2,10 @@ name: Generate Account Top Languages Chart
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "assets/**"   # avoid re-triggering on the bot commit
   schedule:
     - cron: "0 9 * * 1" # Mondays 09:00 UTC
 
