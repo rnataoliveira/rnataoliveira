@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import math
 import os
 import subprocess
 from collections import Counter
@@ -13,7 +14,18 @@ GITHUB_ACTOR = os.environ.get("GITHUB_ACTOR", "")
 TOKEN = os.environ.get("GITHUB_TOKEN", "")  # Provided by Actions
 OUT_DIR = Path("assets")
 OUT_SVG = OUT_DIR / "top-languages-by-commit.svg"
-OUT_PNG = OUT_DIR / "top-languages-by-commit.png"
+
+COLORS = [
+    "#3b82f6",  # blue
+    "#f59e0b",  # amber
+    "#10b981",  # emerald
+    "#ef4444",  # red
+    "#8b5cf6",  # violet
+    "#ec4899",  # pink
+    "#14b8a6",  # teal
+    "#f97316",  # orange
+    "#6b7280",  # gray (Other)
+]
 
 MAX_REPOS = int(os.environ.get("MAX_REPOS", "30"))              # most recently pushed repos
 MAX_COMMITS_PER_REPO = int(os.environ.get("MAX_COMMITS", "400")) # cap per repo for speed
@@ -125,51 +137,88 @@ def clone_repo(clone_url: str, target_dir: Path):
     # We need history, so no --depth. This is still reasonably light with blob filter.
     run(["git", "clone", "--filter=blob:none", "--no-checkout", clone_url, str(target_dir)])
 
-def render_donut(counts: Counter):
+def _polar(cx: float, cy: float, r: float, deg: float) -> tuple[float, float]:
+    rad = math.radians(deg)
+    return cx + r * math.cos(rad), cy + r * math.sin(rad)
+
+
+def _arc_path(cx: float, cy: float, r_out: float, r_in: float, a0: float, a1: float) -> str:
+    large = 1 if a1 - a0 > 180 else 0
+    ox0, oy0 = _polar(cx, cy, r_out, a0)
+    ox1, oy1 = _polar(cx, cy, r_out, a1)
+    ix1, iy1 = _polar(cx, cy, r_in, a1)
+    ix0, iy0 = _polar(cx, cy, r_in, a0)
+    return (
+        f"M{ox0:.3f},{oy0:.3f}"
+        f"A{r_out},{r_out},0,{large},1,{ox1:.3f},{oy1:.3f}"
+        f"L{ix1:.3f},{iy1:.3f}"
+        f"A{r_in},{r_in},0,{large},0,{ix0:.3f},{iy0:.3f}Z"
+    )
+
+
+def render_svg(counts: Counter):
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     total = sum(counts.values()) or 1
     top = counts.most_common(8)
     other = total - sum(v for _, v in top)
-
     labels = [k for k, _ in top]
     values = [v for _, v in top]
     if other > 0:
         labels.append("Other")
         values.append(other)
 
-    import matplotlib.pyplot as plt
+    W, H = 500, 220
+    CX, CY = 385, 117
+    R_OUT, R_IN = 88, 55
+    GAP = 1.5  # degrees gap between segments
 
-    # Smaller overall output than before
-    fig = plt.figure(figsize=(8.2, 3.2), dpi=160)
+    arc_elems: list[str] = []
+    angle = -90.0
+    for i, v in enumerate(values):
+        frac = v / total
+        sweep = frac * 360
+        color = COLORS[i % len(COLORS)]
+        if sweep >= 359.9:
+            mid_r = (R_OUT + R_IN) / 2
+            arc_elems.append(
+                f'<circle cx="{CX}" cy="{CY}" r="{mid_r:.1f}" '
+                f'fill="none" stroke="{color}" stroke-width="{R_OUT - R_IN}"/>'
+            )
+        else:
+            gap = min(GAP, sweep * 0.2)
+            d = _arc_path(CX, CY, R_OUT, R_IN, angle, angle + sweep - gap)
+            arc_elems.append(f'<path d="{d}" fill="{color}"/>')
+        angle += sweep
 
-    # Donut (right)
-    ax = fig.add_subplot(1, 2, 2)
-    ax.set_aspect("equal")
-    wedges, _ = ax.pie(
-        values,
-        startangle=90,
-        wedgeprops=dict(width=0.35, edgecolor="white"),
-        radius=0.92,
-    )
-    ax.set_title("")  # keep clean
-
-    # Legend (left)
-    ax2 = fig.add_subplot(1, 2, 1)
-    ax2.axis("off")
-    ax2.text(0.0, 0.95, "Top Languages by Commit", fontsize=16, fontweight="bold", va="top")
-
-    y = 0.78
-    for (label, v), w in zip(list(zip(labels, values)), wedges):
+    legend_elems: list[str] = []
+    lx, ly = 20, 45
+    for i, (label, v) in enumerate(zip(labels, values)):
         pct = (v / total) * 100
-        ax2.add_patch(plt.Rectangle((0.0, y - 0.03), 0.05, 0.05, color=w.get_facecolor()))
-        ax2.text(0.07, y, f"{label}  ({pct:.1f}%)", fontsize=11, va="center")
-        y -= 0.09
+        color = COLORS[i % len(COLORS)]
+        legend_elems.append(
+            f'<rect x="{lx}" y="{ly - 11}" width="12" height="12" rx="2" fill="{color}"/>'
+            f'<text x="{lx + 17}" y="{ly}" font-size="12" class="t">{label}  {pct:.1f}%</text>'
+        )
+        ly += 19
 
-    plt.tight_layout()
-    fig.savefig(OUT_SVG, format="svg", bbox_inches="tight")
-    fig.savefig(OUT_PNG, format="png", bbox_inches="tight")
-    plt.close(fig)
+    font = '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif'
+    svg = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">\n'
+        f'  <defs><style>\n'
+        f'    .t,.ttl{{font-family:{font};}}\n'
+        f'    .t{{fill:#374151;font-size:12px;}}\n'
+        f'    .ttl{{fill:#111827;font-size:15px;font-weight:600;}}\n'
+        f'    @media(prefers-color-scheme:dark){{\n'
+        f'      .t{{fill:#d1d5db;}} .ttl{{fill:#f3f4f6;}}\n'
+        f'    }}\n'
+        f'  </style></defs>\n'
+        f'  <text x="{lx}" y="22" class="ttl">Top Languages by Commit</text>\n'
+        + "\n".join(f"  {e}" for e in arc_elems) + "\n"
+        + "\n".join(f"  {e}" for e in legend_elems) + "\n"
+        f"</svg>"
+    )
+    OUT_SVG.write_text(svg, encoding="utf-8")
 
 def main():
     owner = GITHUB_ACTOR
@@ -197,11 +246,9 @@ def main():
         print(f"Counting commits/languages in {name}...")
         total_counts.update(compute_language_by_commit(repo_dir))
 
-    render_donut(total_counts)
+    render_svg(total_counts)
 
-    print("Generated chart files:")
-    print(f"- {OUT_SVG}")
-    print(f"- {OUT_PNG}")
+    print(f"Generated: {OUT_SVG}")
     print("Top 10:")
     for k, v in total_counts.most_common(10):
         print(f"  {k}: {v}")
