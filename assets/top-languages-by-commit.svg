@@ -8,22 +8,8 @@
     }
   </style></defs>
   <text x="20" y="22" class="ttl">Top Languages by Commit</text>
-  <path d="M385.000,29.000A88,88,0,0,1,469.051,143.065L437.532,133.291A55,55,0,0,0,385.000,62.000Z" fill="#3b82f6"/>
-  <path d="M468.340,145.257A88,88,0,0,1,351.983,198.572L364.365,167.982A55,55,0,0,0,437.088,134.660Z" fill="#f59e0b"/>
-  <path d="M349.860,197.679A88,88,0,0,1,298.238,131.708L330.774,126.193A55,55,0,0,0,363.037,167.425Z" fill="#10b981"/>
-  <path d="M297.883,129.432A88,88,0,0,1,298.796,99.314L331.122,105.946A55,55,0,0,0,330.552,124.770Z" fill="#ef4444"/>
-  <path d="M299.288,97.064A88,88,0,0,1,310.491,70.177L338.432,87.735A55,55,0,0,0,331.430,104.540Z" fill="#8b5cf6"/>
-  <path d="M311.742,68.242A88,88,0,0,1,330.865,47.621L351.166,73.638A55,55,0,0,0,339.214,86.526Z" fill="#ec4899"/>
-  <path d="M332.700,46.228A88,88,0,0,1,350.081,36.224L363.176,66.515A55,55,0,0,0,352.312,72.767Z" fill="#14b8a6"/>
-  <path d="M352.208,35.338A88,88,0,0,1,365.548,31.177L372.842,63.361A55,55,0,0,0,364.505,65.961Z" fill="#f97316"/>
-  <path d="M367.801,30.697A88,88,0,0,1,382.696,29.030L383.560,62.019A55,55,0,0,0,374.251,63.061Z" fill="#6b7280"/>
-  <rect x="20" y="34" width="12" height="12" rx="2" fill="#3b82f6"/><text x="37" y="45" font-size="12" class="t">JavaScript  30.2%</text>
-  <rect x="20" y="53" width="12" height="12" rx="2" fill="#f59e0b"/><text x="37" y="64" font-size="12" class="t">Markdown  26.3%</text>
-  <rect x="20" y="72" width="12" height="12" rx="2" fill="#10b981"/><text x="37" y="83" font-size="12" class="t">C#  16.2%</text>
-  <rect x="20" y="91" width="12" height="12" rx="2" fill="#ef4444"/><text x="37" y="102" font-size="12" class="t">HTML  5.9%</text>
-  <rect x="20" y="110" width="12" height="12" rx="2" fill="#8b5cf6"/><text x="37" y="121" font-size="12" class="t">Java  5.7%</text>
-  <rect x="20" y="129" width="12" height="12" rx="2" fill="#ec4899"/><text x="37" y="140" font-size="12" class="t">CSS  5.5%</text>
-  <rect x="20" y="148" width="12" height="12" rx="2" fill="#14b8a6"/><text x="37" y="159" font-size="12" class="t">TypeScript  4.1%</text>
-  <rect x="20" y="167" width="12" height="12" rx="2" fill="#f97316"/><text x="37" y="178" font-size="12" class="t">YAML  2.9%</text>
-  <rect x="20" y="186" width="12" height="12" rx="2" fill="#6b7280"/><text x="37" y="197" font-size="12" class="t">Other  3.1%</text>
+  <path d="M385.000,29.000A88,88,0,1,1,310.095,70.814L338.184,88.133A55,55,0,1,0,385.000,62.000Z" fill="#3b82f6"/>
+  <path d="M311.329,68.869A88,88,0,0,1,382.696,29.030L383.560,62.019A55,55,0,0,0,338.956,86.918Z" fill="#f59e0b"/>
+  <rect x="20" y="34" width="12" height="12" rx="2" fill="#3b82f6"/><text x="37" y="45" font-size="12" class="t">Markdown  84.2%</text>
+  <rect x="20" y="53" width="12" height="12" rx="2" fill="#f59e0b"/><text x="37" y="64" font-size="12" class="t">Python  15.8%</text>
 </svg>
